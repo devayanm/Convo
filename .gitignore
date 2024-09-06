@@ -1,0 +1,62 @@
+# General
+*.log
+*.tmp
+*.swp
+*.swo
+*.DS_Store
+*.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Rust
+target/
+Cargo.lock
+**/target/
+**/*.rs.bk
+**/*.pdb
+**/*.dSYM
+**/*.rlib
+**/*.d
+**/*.exe
+**/*.out
+
+# Diesel (if using Diesel for ORM)
+migrations/
+
+# Environment files
+.env
+
+# Backend specific
+backend/target/
+backend/Cargo.lock
+backend/*.rs.bk
+
+# Frontend (assuming a typical frontend setup)
+frontend/node_modules/
+frontend/.env
+frontend/.next/
+frontend/.cache/
+frontend/public/
+frontend/build/
+frontend/dist/
+
+# Desktop (assuming a typical setup with gtk-rs or dioxus)
+desktop/target/
+desktop/Cargo.lock
+
+# Mobile (assuming a typical setup with dioxus or tauri)
+mobile/target/
+mobile/Cargo.lock
+
+# IDE-specific
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+# Log files
+*.log
+
+# Temporary files
+*.tmp
