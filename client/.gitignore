@@ -1,0 +1,39 @@
+# Node modules directory
+node_modules/
+
+# Build output directories
+dist/
+build/
+out/
+
+# Dependency directories
+client/node_modules/
+
+# Logs
+*.log
+
+# OS-specific files
+.DS_Store
+Thumbs.db
+
+# IDE and editor files
+*.swp
+*.swo
+*.sublime-project
+*.sublime-workspace
+.vscode/
+
+# Environment files
+.env
+
+# Temporary files
+*.tmp
+*.temp
+
+# npm package-lock files
+package-lock.json
+yarn.lock
+
+# Other
+*.bak
+*.orig

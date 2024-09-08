@@ -1,0 +1,24 @@
+convo-frontend/
+├── public/
+├── src/
+│   ├── components/
+│   │   ├── Header.js
+│   │   ├── Footer.js
+│   │   ├── Login.js
+│   │   ├── Register.js
+│   │   ├── Meetings.js
+│   │   ├── Messages.js
+│   │   └── Dashboard.js
+│   ├── services/
+│   │   └── api.js
+│   ├── pages/
+│   │   ├── Home.js
+│   │   ├── About.js
+│   │   └── Profile.js
+│   ├── context/
+│   │   └── AuthContext.js
+│   ├── App.js
+│   ├── index.js
+│   └── styles/
+│       └── main.css
+└── package.json
