@@ -8,6 +8,7 @@ import UserProfile from './components/UserProfile';
 import Navbar from './components/Navbar';
 import Homepage from './pages/HomePage';
 import PrivateRoute from './components/PrivateRoute';
+import Footer from './components/Footer';
 
 function App() {
   return (
@@ -20,7 +21,10 @@ function App() {
         <Route path="/meeting/:id/messages" element={<PrivateRoute><Messages /></PrivateRoute>} />
         <Route path="/user/:id" element={<PrivateRoute><UserProfile /></PrivateRoute>} />
         <Route path="/" element={<Homepage />} />
+        <Route path="/meeting" element={<Meetings />} />
+        <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
+      <Footer />
     </div>
   );
 }
