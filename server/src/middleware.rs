@@ -1,9 +1,9 @@
-use actix_web::{dev::ServiceRequest, Error, HttpMessage};
-use actix_web::dev::{Service, ServiceResponse, Transform};
-use futures::future::{ok, Ready, LocalBoxFuture};
-use std::rc::Rc;
-use crate::services::decode_jwt;
 use crate::models::Claims;
+use crate::services::decode_jwt;
+use actix_web::dev::{Service, ServiceResponse, Transform};
+use actix_web::{dev::ServiceRequest, Error, HttpMessage};
+use futures::future::{ok, LocalBoxFuture, Ready};
+use std::rc::Rc;
 
 pub struct AuthMiddleware;
 
@@ -48,6 +48,11 @@ where
     fn call(&self, req: ServiceRequest) -> Self::Future {
         let svc = Rc::clone(&self.service);
 
+        let path = req.path();
+        if path == "/register" || path == "/login" {
+            return Box::pin(async move { svc.call(req).await });
+        }
+
         Box::pin(async move {
             let headers = req.headers();
             if let Some(auth_header) = headers.get("Authorization") {
@@ -60,9 +65,7 @@ where
                                 return svc.call(req).await;
                             }
                             Err(_) => {
-                                return Err(actix_web::error::ErrorUnauthorized(
-                                    "Invalid token",
-                                ));
+                                return Err(actix_web::error::ErrorUnauthorized("Invalid token"));
                             }
                         }
                     }

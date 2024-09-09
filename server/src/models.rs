@@ -26,6 +26,12 @@ pub struct NewUser {
     pub password: String,
 }
 
+#[derive(Deserialize)]
+pub struct LoginRequest {
+    pub email: String,
+    pub password: String,
+}
+
 #[derive(Queryable, Serialize, Deserialize)]
 pub struct Meeting {
     pub id: i32,

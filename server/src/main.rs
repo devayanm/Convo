@@ -1,3 +1,4 @@
+use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
 use env_logger;
@@ -22,7 +23,13 @@ async fn main() -> std::io::Result<()> {
     let server_port = env::var("SERVER_PORT").unwrap_or_else(|_| "8080".to_string());
 
     HttpServer::new(|| {
+        let cors = Cors::default()
+            .allow_any_origin() 
+            .allow_any_method()
+            .allow_any_header();
+
         App::new()
+            .wrap(cors) 
             .route("/", web::get().to(handlers::index))
             .route("/api", web::post().to(handlers::api_handler))
             .route("/register", web::post().to(handlers::register_handler))

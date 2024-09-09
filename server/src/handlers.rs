@@ -1,10 +1,11 @@
-use crate::models::{NewMeeting, NewMessage, NewUser};
+use crate::models::{NewMeeting, NewMessage, NewUser, LoginRequest};
 use crate::services::{
     create_meeting, create_message, create_user, get_meeting_by_id, get_messages_for_meeting,
     hash_password, verify_password, generate_jwt, get_user_by_id, get_user_by_email,
 };
 use actix_web::{web, HttpMessage, HttpRequest, HttpResponse, Responder};
 use crate::models::Claims;
+use serde_json::json;
 
 pub async fn register_handler(users: web::Json<NewUser>) -> impl Responder {
     
@@ -25,21 +26,34 @@ pub async fn register_handler(users: web::Json<NewUser>) -> impl Responder {
 }
 
 
-pub async fn login_handler(user: web::Json<NewUser>) -> impl Responder {
-    match get_user_by_email(&user.email) {
+pub async fn login_handler(body: web::Json<LoginRequest>) -> impl Responder {
+    let login_data = body.into_inner();
+    
+    match get_user_by_email(&login_data.email) {
         Ok(existing_user) => {
-            if verify_password(&user.password, &existing_user.password).unwrap_or(false) {
+            if verify_password(&login_data.password, &existing_user.password).unwrap_or(false) {
                 match generate_jwt(&existing_user.id.to_string()) {
-                    Ok(token) => HttpResponse::Ok().json(token),
-                    Err(_) => HttpResponse::InternalServerError().finish(),
+                    Ok(token) => {
+                        log::info!("Login successful, token generated: {}", token);
+                        HttpResponse::Ok().json(json!({ "token": token }))
+                    },
+                    Err(_) => {
+                        log::error!("Error generating token.");
+                        HttpResponse::InternalServerError().json(json!({ "message": "Error generating token" }))
+                    }
                 }
             } else {
-                HttpResponse::Unauthorized().finish()
+                log::info!("Invalid password for email: {}", login_data.email);
+                HttpResponse::Unauthorized().json(json!({ "message": "Invalid password" }))
             }
         }
-        Err(_) => HttpResponse::Unauthorized().finish(),
+        Err(_) => {
+            log::info!("User not found for email: {}", login_data.email);
+            HttpResponse::Unauthorized().json(json!({ "message": "User not found" }))
+        }
     }
 }
+
 
 pub async fn index() -> impl Responder {
     HttpResponse::Ok().body("Welcome to the Convo server!")

@@ -5,7 +5,7 @@ use diesel::prelude::*;
 use dotenv::dotenv;
 use jsonwebtoken::{decode, errors::Error, Algorithm, DecodingKey, EncodingKey, Header, Validation};
 use std::env;
-
+use log::{info, error};
 
 pub fn get_user_by_id(_id: i32) -> Result<User, diesel::result::Error> {
     let mut connection = establish_mutable_connection();
@@ -72,9 +72,6 @@ pub fn verify_password(password: &str, hash: &str) -> Result<bool, bcrypt::Bcryp
 }
 
 pub fn generate_jwt(user_id: &str) -> Result<String, jsonwebtoken::errors::Error> {
-    
-
-
     let expiration = chrono::Utc::now()
         .checked_add_signed(chrono::Duration::hours(24))
         .expect("valid timestamp")
@@ -91,7 +88,16 @@ pub fn generate_jwt(user_id: &str) -> Result<String, jsonwebtoken::errors::Error
             .as_ref(),
     );
 
-    jsonwebtoken::encode(&Header::default(), &claims, &encoding_key)
+    match jsonwebtoken::encode(&Header::default(), &claims, &encoding_key) {
+        Ok(token) => {
+            info!("Token generated successfully: {}", token);
+            Ok(token)
+        },
+        Err(err) => {
+            info!("Error generating token: {}", err);
+            Err(err)
+        }
+    }
 }
 
 pub fn decode_jwt(token: &str) -> Result<Claims, Error> {
