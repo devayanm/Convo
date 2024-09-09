@@ -1,15 +1,15 @@
+use crate::middleware::AuthMiddleware;
 use actix_cors::Cors;
 use actix_web::{web, App, HttpServer};
 use dotenv::dotenv;
 use env_logger;
 use std::env;
-use crate::middleware::AuthMiddleware;
 
 mod handlers;
+mod middleware;
 mod models;
 mod schema;
 mod services;
-mod middleware;
 mod utils;
 mod ws;
 
@@ -24,12 +24,17 @@ async fn main() -> std::io::Result<()> {
 
     HttpServer::new(|| {
         let cors = Cors::default()
-            .allow_any_origin() 
-            .allow_any_method()
-            .allow_any_header();
+            .allowed_origin("http://localhost:3000") 
+            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"]) 
+            .allowed_headers(vec![
+                actix_web::http::header::AUTHORIZATION, 
+                actix_web::http::header::ACCEPT,
+                actix_web::http::header::CONTENT_TYPE,
+            ])
+            .supports_credentials(); 
 
         App::new()
-            .wrap(cors) 
+            .wrap(cors)
             .route("/", web::get().to(handlers::index))
             .route("/api", web::post().to(handlers::api_handler))
             .route("/register", web::post().to(handlers::register_handler))
