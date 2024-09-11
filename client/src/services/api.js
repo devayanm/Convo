@@ -118,6 +118,14 @@ export const getMeetingById = async (id) => {
   }
 };
 
+export const sendSignalingMessage = async (message) => {
+  try {
+    await axios.post(`/api/signaling`, message);
+  } catch (err) {
+    console.error("Error sending signaling message:", err);
+  }
+};
+
 export const deleteMeeting = async (meetingId) => {
   try {
     console.info("Deleting meeting with ID:", meetingId);
