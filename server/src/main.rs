@@ -21,25 +21,28 @@ async fn main() -> std::io::Result<()> {
     log::info!("Starting server...");
 
     let server_port = env::var("SERVER_PORT").unwrap_or_else(|_| "8080".to_string());
+    log::info!("Server port: {}", server_port);
 
     HttpServer::new(|| {
         let cors = Cors::default()
-            .allowed_origin("http://localhost:3000") 
-            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"]) 
+            .allowed_origin("http://localhost:3000")
+            .allowed_methods(vec!["GET", "POST", "PUT", "DELETE", "OPTIONS"])
             .allowed_headers(vec![
-                actix_web::http::header::AUTHORIZATION, 
+                actix_web::http::header::AUTHORIZATION,
                 actix_web::http::header::ACCEPT,
                 actix_web::http::header::CONTENT_TYPE,
             ])
-            .supports_credentials(); 
+            .supports_credentials();
+
+        log::debug!("Configuring CORS with allowed origin http://localhost:3000");
 
         App::new()
             .wrap(cors)
+            .wrap(AuthMiddleware)
             .route("/", web::get().to(handlers::index))
             .route("/api", web::post().to(handlers::api_handler))
             .route("/register", web::post().to(handlers::register_handler))
             .route("/login", web::post().to(handlers::login_handler))
-            .wrap(AuthMiddleware)
             .service(
                 web::scope("")
                     .route("/user/{id}", web::get().to(handlers::get_user))

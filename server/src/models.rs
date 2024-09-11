@@ -10,7 +10,7 @@ pub struct Claims {
     pub exp: usize,  
 }
 
-#[derive(Queryable, Serialize, Deserialize)]
+#[derive(Debug, Queryable, Serialize, Deserialize)]
 pub struct User {
     pub id: i32,
     pub name: String,
@@ -18,7 +18,7 @@ pub struct User {
     pub password: String,
 }
 
-#[derive(Insertable, Serialize, Deserialize, Clone)]
+#[derive(Debug, Insertable, Serialize, Deserialize, Clone)]
 #[diesel(table_name = users)]
 pub struct NewUser {
     pub name: String,
@@ -26,13 +26,13 @@ pub struct NewUser {
     pub password: String,
 }
 
-#[derive(Deserialize)]
+#[derive(Debug, Deserialize)]
 pub struct LoginRequest {
     pub email: String,
     pub password: String,
 }
 
-#[derive(Queryable, Serialize, Deserialize)]
+#[derive(Debug, Queryable, Serialize, Deserialize)]
 pub struct Meeting {
     pub id: i32,
     pub title: String,
@@ -42,7 +42,7 @@ pub struct Meeting {
     pub creator_id: i32,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
+#[derive(Debug, Insertable, Serialize, Deserialize)]
 #[diesel(table_name = meetings)]
 pub struct NewMeeting {
     pub title: String,
@@ -54,7 +54,7 @@ pub struct NewMeeting {
     pub creator_id: i32,
 }
 
-#[derive(Queryable, Serialize, Deserialize)]
+#[derive(Debug, Queryable, Serialize, Deserialize)]
 pub struct Message {
     pub id: i32,
     pub content: String,
@@ -63,7 +63,7 @@ pub struct Message {
     pub timestamp: NaiveDateTime,
 }
 
-#[derive(Insertable, Serialize, Deserialize)]
+#[derive(Debug, Insertable, Serialize, Deserialize)]
 #[diesel(table_name = messages)]
 pub struct NewMessage {
     pub content: String,

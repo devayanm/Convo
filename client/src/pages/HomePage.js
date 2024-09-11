@@ -50,7 +50,9 @@ const Homepage = () => {
           time: newMeetingTime,
         };
         const scheduledMeeting = await createMeeting(newMeeting);
+
         setUpcomingMeetings([...upcomingMeetings, scheduledMeeting]);
+
         setNewMeetingTitle("");
         setNewMeetingTime("");
         setShowScheduleModal(false);

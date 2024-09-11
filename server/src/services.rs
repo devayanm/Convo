@@ -1,11 +1,13 @@
 use crate::models::{Claims, Meeting, Message, NewMeeting, NewMessage, NewUser, User};
+use actix_web::error::ErrorUnauthorized;
 use bcrypt::{hash, verify, DEFAULT_COST};
 use diesel::pg::PgConnection;
 use diesel::prelude::*;
 use dotenv::dotenv;
-use jsonwebtoken::{decode, errors::Error, Algorithm, DecodingKey, EncodingKey, Header, Validation};
+use jsonwebtoken::{decode, errors::ErrorKind, DecodingKey, EncodingKey, Header, Validation};
+use log::info;
+use std::cmp::min;
 use std::env;
-use log::{info, error};
 
 pub fn get_user_by_id(_id: i32) -> Result<User, diesel::result::Error> {
     let mut connection = establish_mutable_connection();
@@ -92,7 +94,7 @@ pub fn generate_jwt(user_id: &str) -> Result<String, jsonwebtoken::errors::Error
         Ok(token) => {
             info!("Token generated successfully: {}", token);
             Ok(token)
-        },
+        }
         Err(err) => {
             info!("Error generating token: {}", err);
             Err(err)
@@ -100,13 +102,37 @@ pub fn generate_jwt(user_id: &str) -> Result<String, jsonwebtoken::errors::Error
     }
 }
 
-pub fn decode_jwt(token: &str) -> Result<Claims, Error> {
-    let decoding_key = DecodingKey::from_secret(
-        env::var("JWT_SECRET")
-            .expect("JWT_SECRET must be set")
-            .as_ref(),
-    );
-    let validation = Validation::new(Algorithm::HS256);
-    let token_data = decode::<Claims>(&token, &decoding_key, &validation)?;
-    Ok(token_data.claims)
+pub fn decode_jwt(token: &str) -> Result<Claims, actix_web::Error> {
+    log::info!("Decoding JWT token: {}", &token[0..min(10, token.len())]);
+
+    let jwt_secret = match env::var("JWT_SECRET") {
+        Ok(secret) => secret,
+        Err(_) => {
+            log::error!("JWT_SECRET environment variable is not set.");
+            return Err(ErrorUnauthorized("JWT secret is not configured").into());
+        }
+    };
+
+    let decoding_key = DecodingKey::from_secret(jwt_secret.as_ref());
+
+    match decode::<Claims>(token, &decoding_key, &Validation::default()) {
+        Ok(token_data) => {
+            log::info!("Token successfully decoded: {:?}", token_data.claims);
+            Ok(token_data.claims)
+        }
+        Err(err) => match *err.kind() {
+            ErrorKind::ExpiredSignature => {
+                log::error!("Token has expired: {:?}", err);
+                Err(ErrorUnauthorized("Token has expired").into())
+            }
+            ErrorKind::InvalidToken => {
+                log::error!("Invalid token: {:?}", err);
+                Err(ErrorUnauthorized("Invalid token").into())
+            }
+            _ => {
+                log::error!("Error decoding token: {:?}", err);
+                Err(ErrorUnauthorized("Error decoding token").into())
+            }
+        },
+    }
 }

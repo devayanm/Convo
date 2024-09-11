@@ -9,18 +9,20 @@ import Navbar from './components/Navbar';
 import Homepage from './pages/HomePage';
 import PrivateRoute from './components/PrivateRoute';
 import Footer from './components/Footer';
+import MeetingDetails from './components/MeetingDetails';
 
 function App() {
   return (
     <div>
       <Navbar />
       <Routes>
+        <Route path="/" element={<Homepage />} />
         <Route path="/register" element={<Register />} />
         <Route path="/login" element={<Login />} />
         <Route path="/meetings" element={<PrivateRoute element={Meetings} />} />
+        <Route path="/meeting/:id" element={MeetingDetails} /> 
         <Route path="/meeting/:id/messages" element={<PrivateRoute element={Messages} />} />
         <Route path="/user/:id" element={<PrivateRoute element={UserProfile} />} />
-        <Route path="/" element={<Homepage />} />
         <Route path="/meeting" element={<Meetings />} />
         <Route path="*" element={<h1>Not Found</h1>} />
       </Routes>
